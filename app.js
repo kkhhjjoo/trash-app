@@ -7,62 +7,16 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const listElem = document.getElementById('trashList');
 const findMeBtn = document.getElementById('findMeBtn');
 
-// 🎯 샘플 데이터 (테스트용)
-const SAMPLE_DATA = [
-  {
-    설치장소명: '올림픽공원 정문',
-    소재지도로명주소: '서울 송파구 올림픽로 240',
-    휴지통종류: '재활용휴지통',
-    위도: 37.5176,
-    경도: 127.1229,
-  },
-  {
-    설치장소명: '잠실역 1번 출구',
-    소재지도로명주소: '서울 송파구 올림픽로 300',
-    휴지통종류: '일반휴지통',
-    위도: 37.5133,
-    경도: 127.1018,
-  },
-  {
-    설치장소명: '한강공원 송파지구',
-    소재지도로명주소: '서울 송파구 잠실동',
-    휴지통종류: '재활용휴지통',
-    위도: 37.5101,
-    경도: 127.1072,
-  },
-  {
-    설치장소명: '석촌호수공원',
-    소재지도로명주소: '서울 송파구 석촌동',
-    휴지통종류: '일반휴지통',
-    위도: 37.5056,
-    경도: 127.0965,
-  },
-  {
-    설치장소명: '마천역 3번 출구',
-    소재지도로명주소: '서울 송파구 마천동',
-    휴지통종류: '일반휴지통',
-    위도: 37.4965,
-    경도: 127.1528,
-  },
-  {
-    설치장소명: '문정역 1번 출구',
-    소재지도로명주소: '서울 송파구 문정동',
-    휴지통종류: '재활용휴지통',
-    위도: 37.4853,
-    경도: 127.1214,
-  },
-];
-
 // 공공데이터 API 설정 (실제 API 사용 시)
-const USE_API = false; // 🎯 샘플 데이터 사용: true로 변경하면 API 사용
+const USE_API = false; // 🎯 data.json 파일 사용
 const SERVICE_KEY =
   'b0439d73407d26dac75e4d5f7f3669ea98ed6c0abe72e74ddb8386ba9b9a6fe9';
 const API_BASE_URL =
-  'https://api.odcloud.kr/api/15018012/v1/uddi:d188c96d-0c7f-4848-ad32-949efe4c20d3_201908231505';
+  'https://api.odcloud.kr/api/15087862/v1/uddi:9e872fe1-0af7-4c8d-a3a9-9c360f496a3a';
 
 // API URL 생성 함수
-function getAPIUrl(page = 1, perPage = 10) {
-  return `${API_BASE_URL}?page=${page}&perPage=${perPage}&serviceKey=${SERVICE_KEY}`;
+function getAPIUrl(page = 1, perPage = 100) {
+  return `${API_BASE_URL}?page=${page}&perPage=${perPage}&returnType=json&serviceKey=${SERVICE_KEY}`;
 }
 
 // 마커 그룹
@@ -96,12 +50,16 @@ async function fetchTrashData(lat, lng) {
     if (USE_API) {
       // 실제 API 호출
       console.log('🌐 API 호출 중...');
-      const API_URL = getAPIUrl(1, 1000);
+      const API_URL = getAPIUrl(1, 100);
       console.log('🔍 API URL:', API_URL);
 
       const res = await fetch(API_URL, {
         method: 'GET',
         mode: 'cors',
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${SERVICE_KEY}`, // 일부 API는 헤더로 인증
+        },
       });
 
       if (!res.ok) {
@@ -109,18 +67,32 @@ async function fetchTrashData(lat, lng) {
       }
 
       const json = await res.json();
+      console.log('📊 받은 응답:', json);
 
-      if (!json.data || !Array.isArray(json.data)) {
-        throw new Error('데이터가 올바르지 않습니다.');
+      // 응답 구조 확인 및 데이터 추출
+      if (json.data && Array.isArray(json.data)) {
+        items = json.data;
+        console.log('✅ 데이터 필드:', items.length, '개');
+      } else if (Array.isArray(json)) {
+        // 배열로 직접 반환되는 경우
+        items = json;
+        console.log('✅ 배열 데이터:', items.length, '개');
+      } else {
+        throw new Error(
+          '데이터 구조가 올바르지 않습니다. 응답: ' + JSON.stringify(json)
+        );
+      }
+    } else {
+      // 🎯 data.json 파일 로드
+      console.log('📂 data.json 로드 중...');
+      const res = await fetch('data.json');
+
+      if (!res.ok) {
+        throw new Error(`data.json을 불러올 수 없습니다: ${res.status}`);
       }
 
-      items = json.data;
-    } else {
-      // 🎯 샘플 데이터 사용
-      console.log('🎨 샘플 데이터 사용 중...');
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 로딩 효과
-      items = SAMPLE_DATA;
-      console.log('📦 샘플 데이터:', items.length, '개');
+      items = await res.json();
+      console.log('✅ data.json 로드 완료:', items.length, '개');
     }
 
     // 내 위치 기준 반경 1km 필터링
@@ -160,7 +132,8 @@ function renderList(items) {
     li.innerHTML = `
       <strong>${item['설치장소명'] || '이름 없음'}</strong><br/>
       📍 ${item['소재지도로명주소'] || '주소 정보 없음'}<br/>
-      종류: ${item['휴지통종류'] || '일반'}
+      🏷️ ${item['설치장소특성'] || '기타'}<br/>
+      종류: ${item['수거쓰레기종류'] || item['휴지통종류'] || '일반'}
     `;
 
     // 클릭 이벤트 추가
@@ -201,7 +174,8 @@ function renderMarkers(items) {
     const marker = L.marker([item['위도'], item['경도']]).bindPopup(`
         <b>${item['설치장소명'] || '이름 없음'}</b><br/>
         ${item['소재지도로명주소'] || '주소 없음'}<br/>
-        종류: ${item['휴지통종류'] || '일반'}
+        🏷️ ${item['설치장소특성'] || '기타'}<br/>
+        종류: ${item['수거쓰레기종류'] || item['휴지통종류'] || '일반'}
       `);
     markerGroup.addLayer(marker);
 
