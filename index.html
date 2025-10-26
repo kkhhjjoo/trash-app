@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>휴지통 지도</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
-<body>
-  <header>
-    <h1>🗑️ 내 주변 휴지통 찾기</h1>
-    <button id="findMeBtn">📍 내 위치로 이동</button>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>휴지통 지도</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  </head>
+  <body>
+    <header>
+      <h1>🗑️ 내 주변 휴지통 찾기</h1>
+      <button id="findMeBtn">📍 내 위치로 이동</button>
+    </header>
 
-  <main>
-    <div id="map"></div>
-    <div id="list">
-      <h2>휴지통 목록</h2>
-      <ul id="trashList"></ul>
-    </div>
-  </main>
+    <main>
+      <div id="map"></div>
+      <div id="list">
+        <h2>휴지통 목록</h2>
+        <div id="searchBox">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 휴지통 검색 (장소명, 주소, 유형)"
+          />
+          <button id="searchBtn">검색</button>
+        </div>
+        <ul id="trashList"></ul>
+      </div>
+    </main>
 
-  <footer>
-    <p>공공데이터포털 API 사용 | Made with Vanilla JS</p>
-  </footer>
+    <footer>
+      <p>공공데이터포털 API 사용 | Made with Vanilla JS</p>
+    </footer>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="app.js"></script>
-</body>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>

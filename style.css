@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   font-family: 'Pretendard', sans-serif;
@@ -10,7 +11,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: #F96162;
+  background: #f96162;
   color: white;
 }
 
@@ -40,6 +41,42 @@ main {
   border-left: 1px solid #ddd;
 }
 
+#searchBox {
+  padding: 10px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  gap: 8px;
+}
+
+#searchInput {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+#searchInput:focus {
+  outline: none;
+  border-color: #f96162;
+}
+
+#searchBtn {
+  padding: 10px 20px;
+  background: #f96162;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+#searchBtn:hover {
+  background: #e85556;
+}
+
 #trashList {
   list-style: none;
   padding: 0;
@@ -51,11 +88,11 @@ main {
   margin: 8px;
   padding: 10px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 #trashList li strong {
-  color: #F96162;
+  color: #f96162;
 }
 
 footer {
